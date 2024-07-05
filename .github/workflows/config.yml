@@ -191,7 +191,7 @@ jobs:
               "lazy_cache": true,
               "reverse_mapping": true,
               "mapping_override": true,
-              "fakeip": { "enabled": true, "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18", "exclude_rule": { "rule_set": [ "fakeip-filter", "private" ] } }
+              "fakeip": { "enabled": true, "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18", "exclude_rule": { "geosite": [ "fakeip-filter", "private" ] } }
             }
           }
           EOF
