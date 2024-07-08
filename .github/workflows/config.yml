@@ -65,8 +65,8 @@ jobs:
           curl -sSL ${trackerslist} | grep -i '\.[A-Z]' | awk -F'[/:]' '{print $4}' | sed 's/^/    - /' >> ./clash-config/geodata-fakeip-user.yaml
           cat <<EOF >> ./clash-config/geodata-fakeip-user.yaml
             nameserver:
-              - https://1.12.12.12/dns-query
-              - https://223.5.5.5/dns-query
+              - https://doh.pub/dns-query
+              - https://dns.alidns.com/dns-query
               
           EOF
 
@@ -118,12 +118,12 @@ jobs:
             enhanced-mode: fake-ip
             fake-ip-filter: ['+.*']
             nameserver:
-              - https://1.12.12.12/dns-query
-              - https://223.5.5.5/dns-query
+              - https://doh.pub/dns-query
+              - https://dns.alidns.com/dns-query
             nameserver-policy:
               'geosite:ads': rcode://success
-              'geosite:microsoft-cn,apple-cn,google-cn,games-cn,cn,private': [https://1.12.12.12/dns-query, https://223.5.5.5/dns-query]
-              'geosite:proxy': ['https://8.8.8.8/dns-query#🪜 代理域名', 'https://1.1.1.1/dns-query#🪜 代理域名']
+              'geosite:cn': [https://doh.pub/dns-query, https://dns.alidns.com/dns-query]
+              'geosite:proxy': [https://dns.google/dns-query, https://cloudflare-dns.com/dns-query]
           EOF
 
       - name: Generate `clash` geodata-redirhost-user-noprocess.yaml
