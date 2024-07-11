@@ -68,8 +68,8 @@ jobs:
           curl -sSL ${trackerslist} | grep -i '\.[A-Z]' | awk -F'[/:]' '{print $4}' | sed 's/^/    - /' >> ./clash-config/geodata-fakeip-user.yaml
           cat <<EOF >> ./clash-config/geodata-fakeip-user.yaml
             nameserver:
+              - quic://dns.alidns.com:853
               - https://doh.pub/dns-query
-              - https://dns.alidns.com/dns-query
               
           EOF
 
@@ -124,12 +124,12 @@ jobs:
             enhanced-mode: fake-ip
             fake-ip-filter: ['+.*']
             nameserver:
+              - quic://dns.alidns.com:853
               - https://doh.pub/dns-query
-              - https://dns.alidns.com/dns-query
             nameserver-policy:
               'geosite:ads': rcode://success
-              'geosite:cn': [https://doh.pub/dns-query, https://dns.alidns.com/dns-query]
-              'geosite:proxy': [https://dns.google/dns-query, https://cloudflare-dns.com/dns-query]
+              'geosite:cn': [quic://dns.alidns.com:853, https://doh.pub/dns-query]
+              'geosite:proxy': ['https://dns.google/dns-query#h3=true', 'https://cloudflare-dns.com/dns-query#h3=true']
           EOF
 
       - name: Generate `clash` geodata-redirhost-user-noprocess.yaml
@@ -179,15 +179,15 @@ jobs:
             "dns": {
               "hosts": {
                 "miwifi.com": [ "192.168.31.1" ],
-                "doh.pub": [ "1.12.12.12", "120.53.53.53", "2402:4e00::" ],
                 "dns.alidns.com": [ "223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1" ],
+                "doh.pub": [ "1.12.12.12", "120.53.53.53", "2402:4e00::" ],
                 "dns.google": [ "8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844" ],
                 "cloudflare-dns.com": [ "1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001" ]
               },
               "servers": [
                 { "tag": "dns_block", "address": "rcode://success" },
-                { "tag": "dns_direct", "address": [ "https://doh.pub/dns-query", "https://dns.alidns.com/dns-query" ], "detour": "DIRECT" },
-                { "tag": "dns_proxy", "address": [ "https://dns.google/dns-query", "https://cloudflare-dns.com/dns-query" ] },
+                { "tag": "dns_direct", "address": [ "h3://dns.alidns.com/dns-query", "https://doh.pub/dns-query" ], "detour": "DIRECT" },
+                { "tag": "dns_proxy", "address": [ "h3://dns.google/dns-query", "h3://cloudflare-dns.com/dns-query" ] },
                 { "tag": "dns_fakeip", "address": "fakeip" }
               ],
               "rules": [
@@ -198,7 +198,7 @@ jobs:
                 { "geosite": [ "cn", "proxy" ], "query_type": [ "A", "AAAA" ], "server": "dns_fakeip", "rewrite_ttl": 0 },
                 { "fallback_rules": [ { "geoip": [ "cn" ], "server": "dns_direct" }, { "match_all": true, "server": "dns_fakeip", "rewrite_ttl": 0 } ], "allow_fallthrough": true, "server": "dns_proxy" }
               ],
-              "final": "dns_proxy",
+              "final": "dns_direct",
               "strategy": "prefer_ipv4",
               "independent_cache": true,
               "lazy_cache": true,
