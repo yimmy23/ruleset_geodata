@@ -217,7 +217,7 @@ jobs:
 
       - name: Generate `sing-box` geodata-fakeip-dns.json
         run: |
-          grep -v '"geosite": \[ "cn" \]' ./sing-box-config/geodata-mix-dns.json | sed 's/{ "geoip": \[ "cn" \], "server": "dns_direct" }, //' > ./sing-box-config/geodata-fakeip-dns.json
+          grep -v '"geosite": \[ "cn" \]' ./sing-box-config/geodata-mix-dns.json | sed 's/"proxy"/"cn", "proxy"/' | sed 's/{ "geoip": \[ "cn" \], "server": "dns_direct" }, //' > ./sing-box-config/geodata-fakeip-dns.json
 
       - name: Generate `sing-box` geodata-fakeip-dns-lite.json
         run: |
@@ -233,7 +233,7 @@ jobs:
 
       - name: Generate `sing-box` ruleset-fakeip-dns.json
         run: |
-          grep -v '"rule_set": \[ "cn" \]' ./sing-box-config/ruleset-mix-dns.json | sed 's/{ "rule_set": \[ "cnip" \], "server": "dns_direct" }, //' > ./sing-box-config/ruleset-fakeip-dns.json
+          grep -v '"rule_set": \[ "cn" \]' ./sing-box-config/ruleset-mix-dns.json | sed 's/"proxy"/"cn", "proxy"/' | sed 's/{ "rule_set": \[ "cnip" \], "server": "dns_direct" }, //' > ./sing-box-config/ruleset-fakeip-dns.json
 
       - name: Generate `sing-box` ruleset-fakeip-dns-lite.json
         run: |
