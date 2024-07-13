@@ -257,11 +257,13 @@ curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\profiles\Merge.yaml 
 `dns.fakeip.exclude_rule` 中的 `"geosite": [ "fakeip-filter" ]` 添加 [ShellCrash/public/fake_ip_filter.list](https://github.com/juewuy/ShellCrash/blob/dev/public/fake_ip_filter.list)（已添加 AdGuardHome 相关域名，包括：`adguardteam.github.io`、`adrules.top`、`anti-ad.net` 和 `static.adtidy.org`，防止作为下游时检查更新和下载“DNS 黑名单”失败），提高兼容性  
 `dns.fakeip.exclude_rule` 中的 `"geosite": [ "private" ]` 添加 [TrackersList](https://github.com/XIU2/TrackersListCollection/blob/master/all.txt)，防止 [BT 下载](https://github.com/c0re100/qBittorrent-Enhanced-Edition)无法连接 TrackersList UDP 协议  
 <img src="https://user-images.githubusercontent.com/45238096/224113233-4d76dec2-495c-4790-a00e-538fc1469639.png" width="60%"/>  
-若想自己生成配置文件 dns.json，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```Generate `sing-box` geodata-dns-xxx.json``` 部分  
+若想自己生成配置文件 dns.json，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```Generate `sing-box` geodata-xxx-dns-xxx.json``` 部分  
 • 导入 Linux 端（以导入 ShellCrash 为例）   
 连接 SSH 后执行如下命令：
+- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `mix`）
+
 ```
-curl -o $CRASHDIR/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/geodata-dns-lite.json
+curl -o $CRASHDIR/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/geodata-{DNS 模式}-dns-lite.json
 $CRASHDIR/start.sh restart
 ```
 ### ③ 添加定时任务（以 ShellCrash 为例，安装路径为 */data/ShellCrash*）  
@@ -828,11 +830,13 @@ curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\profiles\Merge.yaml 
 `dns.fakeip.exclude_rule` 中的 `"rule_set": [ "fakeip-filter" ]` 添加 [ShellCrash/public/fake_ip_filter.list](https://github.com/juewuy/ShellCrash/blob/dev/public/fake_ip_filter.list)（已添加 AdGuardHome 相关域名，包括：`adguardteam.github.io`、`adrules.top`、`anti-ad.net` 和 `static.adtidy.org`，防止作为下游时检查更新和下载“DNS 黑名单”失败），提高兼容性  
 `dns.fakeip.exclude_rule` 中的 `"rule_set": [ "private" ]` 添加 [TrackersList](https://github.com/XIU2/TrackersListCollection/blob/master/all.txt)，防止 [BT 下载](https://github.com/c0re100/qBittorrent-Enhanced-Edition)无法连接 TrackersList UDP 协议  
 <img src="https://user-images.githubusercontent.com/45238096/224113233-4d76dec2-495c-4790-a00e-538fc1469639.png" width="60%"/>  
-若想自己生成配置文件 dns.json，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```Generate `sing-box` ruleset-dns-xxx.json``` 部分  
+若想自己生成配置文件 dns.json，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```Generate `sing-box` ruleset-xxx-dns-xxx.json``` 部分  
 • 导入 Linux 端（以导入 ShellCrash 为例）   
 连接 SSH 后执行如下命令：
+- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `mix`）
+
 ```
-curl -o $CRASHDIR/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/ruleset-dns-lite.json
+curl -o $CRASHDIR/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/ruleset-{DNS 模式}-dns-lite.json
 $CRASHDIR/start.sh restart
 ```
 ### ③ 添加定时任务（以 ShellCrash 为例，安装路径为 */data/ShellCrash*）
