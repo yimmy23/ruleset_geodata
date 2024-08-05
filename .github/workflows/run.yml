@@ -251,6 +251,17 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin clash
 
+      - name: Release and upload `clash-ruleset` assets
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: clash-ruleset
+          tag: clash-ruleset
+          overwrite: true
+          body: "Clash ruleset 规则集文件，包含 .yaml、.list 和 .mrs 格式"
+          file_glob: true
+          file: ./clash-ruleset/*
+
       - name: Commit and push `clash-ruleset` branch
         run: |
           cd ./clash-ruleset/ || exit 1
@@ -284,6 +295,17 @@ jobs:
           git commit -m "sing-box ruleset_geodata 文件更新于 ${update_version}"
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin sing-box
+
+      - name: Release and upload `sing-box-ruleset` assets
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: sing-box-ruleset
+          tag: sing-box-ruleset
+          overwrite: true
+          body: "sing-box ruleset 规则集文件，包含 .srs 和 .json 格式"
+          file_glob: true
+          file: ./sing-box-ruleset/*
 
       - name: Commit and push `sing-box-ruleset` branch
         run: |
