@@ -248,8 +248,8 @@ $CRASHDIR/start.sh restart
 以管理员身份运行 CMD 命令提示符，执行如下命令：
 ```
 taskkill /f /t /im "Clash Verge*"
-taskkill /f /t /im Clash-Verge*
-taskkill /f /t /im clash-meta*
+taskkill /f /t /im clash-verge*
+taskkill /f /t /im verge-mihomo*
 curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\geosite.dat -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/geosite.dat
 curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\geoip.dat -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/geoip.dat
 curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\Country.mmdb -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/Country.mmdb
