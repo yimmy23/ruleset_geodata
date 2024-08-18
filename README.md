@@ -1,5 +1,41 @@
 # 注意：
-**[sing-box PuerNya 版内核](https://github.com/DustinWin/clash_singbox-tools/tree/sing-box)已同步到 v1.10.0+ 版本，[规则集 rule_set 文件](https://github.com/DustinWin/ruleset_geodata/tree/master#%E4%BA%8C-ruleset-%E8%A7%84%E5%88%99%E9%9B%86%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E)有改动，须一并同步**
+- 1. [sing-box PuerNya 版内核](https://github.com/DustinWin/clash_singbox-tools/tree/sing-box)已同步到 v1.10.0+ 版本，[规则集 rule_set 文件](https://github.com/DustinWin/ruleset_geodata/tree/master#%E4%BA%8C-ruleset-%E8%A7%84%E5%88%99%E9%9B%86%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E)有改动，须一并同步
+- 2. “文件拓展”中的 Clash user.yaml 和 sing-box dns.json 文件已被删除，原因是 [mihomo Alpha 版](https://github.com/MetaCubeX/mihomo/blob/Alpha/docs/config.yaml)的 `dns.fake-ip-filter` 已支持规则集格式，不需要去自动生成域名格式了，遂一并删除
+- 3. 具体使用方法可以参考如下配置：
+
+① mihomo Alpha 版内核：
+```
+dns:
+  enable: true
+  prefer-h3: true
+  ipv6: true
+  listen: 0.0.0.0:1053
+  fake-ip-range: 198.18.0.1/16
+  enhanced-mode: fake-ip
+  fake-ip-filter:
+    # geodata 方案（本项目中的所有 geosite.dat 文件已经集成 `fakeip-filter` 规则）
+    - geosite:fakeip-filter
+    # ruleset 方案（记得添加本项目中的 `rule-providers.fakeip-filter` 规则订阅）
+    - rule-set:fakeip-filter
+```
+② sing-box PuerNya 版内核：
+```
+{
+  "dns": {
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18",
+      "exclude_rule": {
+        // geodata 方案（本项目中的所有 geosite.db 文件已经集成 `fakeip-filter` 规则）
+        "geosite": [ "fakeip-filter" ]
+        // ruleset 方案（记得添加本项目中的 `route.rule_set.fakeip-filter` 规则订阅）
+        "rule_set": [ "fakeip-filter" ]
+      }
+    }
+  }
+}
+```
 
 # 一、 geodata 规则集文件说明
 ## 1. 文件类型
@@ -220,89 +256,6 @@ curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\Country.mmdb -L http
 curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\geoip.metadb -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/geoip.metadb
 curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\ASN.mmdb -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/Country-ASN.mmdb
 ```
-</details>
-
-## 5. 文件拓展
-<details>
-<summary>① <a href="https://github.com/DustinWin/ruleset_geodata/tree/clash-config">user.yaml</a>（仅限 mihomo 内核）</summary>
-
-注：
-- 1. 每天凌晨 3 点（北京时间）自动构建
-- 2. 含有“fakeip”字样的 .yaml 配置文件才含有 `fake-ip-filter` 参数的数据
-
-**配置文件名关键字与使用场景对应关系如下表：**
-|文件名关键字|使用场景|
-|-----|-----|
-|lite|无广告拦截（可搭配 [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome)）|
-|noprocess|不含进程匹配模式，仅适合 ShellCrash|
-
-• `fake-ip-filter` 参数  
-`fake-ip-filter` 中添加 [ShellCrash/public/fake_ip_filter.list](https://github.com/juewuy/ShellCrash/blob/dev/public/fake_ip_filter.list)（已添加 AdGuard Home 相关域名，包括：`adguardteam.github.io`、`adrules.top`、`anti-ad.net` 和 `static.adtidy.org`，防止作为下游时检查更新和下载“DNS 黑名单”失败），提高兼容性  
-`fake-ip-filter` 中添加 [TrackersList](https://github.com/XIU2/TrackersListCollection/blob/master/all.txt)，防止 [BT 下载](https://github.com/c0re100/qBittorrent-Enhanced-Edition)无法连接 TrackersList UDP 协议  
-<img src="https://user-images.githubusercontent.com/45238096/224113233-4d76dec2-495c-4790-a00e-538fc1469639.png" width="60%"/>
-
-若想自己生成配置文件 user.yaml，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```name: Generate `clash` geodata-xxx-user.yaml``` 部分  
-若 DNS 模式选用的是 `redir-host`，必须进行 DNS 分流（可以参考 [mihomo 内核 DNS 分流教程](https://github.com/DustinWin/clash_singbox-tutorials/tree/main/%E6%95%99%E7%A8%8B%E5%90%88%E9%9B%86/Clash/%E8%BF%9B%E9%98%B6%E7%AF%87)），可以进入 *.github/workflows/config.yml* 文件，编辑 ```Generate `clash` geodata-redirhost-user.yaml``` 部分  
-• 导入 Linux 端（以导入 ShellCrash 为例）  
-连接 SSH 后执行如下命令：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `redirhost`）
-
-```
-curl -o $CRASHDIR/yamls/user.yaml -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash-config/geodata-{DNS 模式}-user-lite-noprocess.yaml
-$CRASHDIR/start.sh restart
-```
-• 导入 Windows 端（以导入 Clash Verge 为例）  
-以管理员身份打开 CMD 命令提示符，执行如下命令：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `redirhost`）
-
-```
-taskkill /f /t /im "Clash Verge*"
-taskkill /f /t /im Clash-Verge*
-taskkill /f /t /im clash-meta*
-curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\profiles\Merge.yaml -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash-config/geodata-{DNS 模式}-user.yaml
-```
-</details>
-<details>
-<summary>② <a href="https://github.com/DustinWin/ruleset_geodata/tree/sing-box-config">dns.json</a>（仅限 <a href="https://github.com/PuerNya/sing-box/tree/building">sing-box PuerNya 版内核</a>）</summary>
-
-注：
-- 1. 每天凌晨 3 点（北京时间）自动构建
-- 2. 含有“lite”后缀的 .json 配置文件适合无 sing-box 广告拦截的方案（可搭配 AdGuard Home）
-
-• `dns.fakeip.exclude_rule` 数组  
-`dns.fakeip.exclude_rule` 中的 `"geosite": [ "fakeip-filter" ]` 添加 [ShellCrash/public/fake_ip_filter.list](https://github.com/juewuy/ShellCrash/blob/dev/public/fake_ip_filter.list)（已添加 AdGuard Home 相关域名，包括：`adguardteam.github.io`、`adrules.top`、`anti-ad.net` 和 `static.adtidy.org`，防止作为下游时检查更新和下载“DNS 黑名单”失败），提高兼容性  
-`dns.fakeip.exclude_rule` 中的 `"geosite": [ "private" ]` 添加 [TrackersList](https://github.com/XIU2/TrackersListCollection/blob/master/all.txt)，防止 [BT 下载](https://github.com/c0re100/qBittorrent-Enhanced-Edition)无法连接 TrackersList UDP 协议  
-<img src="https://user-images.githubusercontent.com/45238096/224113233-4d76dec2-495c-4790-a00e-538fc1469639.png" width="60%"/>
-
-若想自己生成配置文件 dns.json，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```Generate `sing-box` geodata-xxx-dns-xxx.json``` 部分  
-• 导入 Linux 端（以导入 ShellCrash 为例）  
-连接 SSH 后执行如下命令：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `mix`）
-
-```
-curl -o $CRASHDIR/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/geodata-{DNS 模式}-dns-lite.json
-$CRASHDIR/start.sh restart
-```
-</details>
-<details>
-<summary>③ 添加定时任务（以 ShellCrash 为例，安装路径为 <i>/data/ShellCrash</i>）</summary>
-
-连接 SSH 后执行 `vi $CRASHDIR/task/task.user`，按一下 Ins 键（Insert 键），粘贴如下内容：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip`、`redirhost` 或 `mix`）
-
-```
-# 适用于 Clash 内核
-201#curl -o /data/ShellCrash/GeoSite.dat -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/geosite.dat && curl -o /data/ShellCrash/GeoIP.dat -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/geoip.dat && curl -o /data/ShellCrash/Country.mmdb -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/Country.mmdb && /data/ShellCrash/start.sh restart >/dev/null 2>&1#更新geodata路由规则文件
-# 适用于 mihomo 内核
-202#curl -o /data/ShellCrash/geoip.metadb -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/geoip.metadb && curl -o /data/ShellCrash/ASN.mmdb -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash/Country-ASN.mmdb && /data/ShellCrash/start.sh restart >/dev/null 2>&1#更新geodata路由规则文件
-203#curl -o /data/ShellCrash/yamls/user.yaml -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash-config/geodata-{DNS 模式}-user-lite-noprocess.yaml && /data/ShellCrash/start.sh restart >/dev/null 2>&1#更新user.yaml
-# 适用于 sing-box 内核
-204#curl -o /data/ShellCrash/geosite.db -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box/geosite.db && curl -o /data/ShellCrash/geoip.db -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box/geoip.db && /data/ShellCrash/start.sh restart >/dev/null 2>&1#更新geodata路由规则文件
-$ 适用于 sing-box PuerNya 版内核
-205#curl -o /data/ShellCrash/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/geodata-{DNS 模式}-dns-lite.json#更新dns.json
-```
-按一下 Esc 键（退出键），输入英文冒号 `:`，继续输入 `wq` 并回车  
-执行 `crash`，进入 ShellCrash -> 5 配置自动任务 -> 1 添加自动任务，可以看到末尾就有添加的定时任务，输入对应的数字并回车后可设置执行条件
 </details>
 
 # 二、 ruleset 规则集文件说明
@@ -824,82 +777,4 @@ rules:
   }
 }
 ```
-</details>
-
-## 4. 文件拓展
-<details>
-<summary>① <a href="https://github.com/DustinWin/ruleset_geodata/tree/clash-config">user.yaml</a>（仅限 [mihomo 内核](https://github.com/MetaCubeX/mihomo)）</summary>
-
-注：
-- 1. 每天凌晨 3 点（北京时间）自动构建  
-- 2. 含有“fakeip”字样的 .yaml 配置文件才含有 `fake-ip-filter` 参数的数据
-
-**配置文件名关键字与使用场景对应关系如下表：**
-|文件名关键字|使用场景|
-|-----|-----|
-|lite|无广告拦截，可搭配 [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome)|
-|noprocess|不含进程匹配模式，仅适合 ShellCrash|
-
-• `fake-ip-filter` 参数  
-`fake-ip-filter` 中添加 [ShellCrash/public/fake_ip_filter.list](https://github.com/juewuy/ShellCrash/blob/master/public/fake_ip_filter.list)（已添加 AdGuard Home 相关域名，包括：`adguardteam.github.io`、`adrules.top`、`anti-ad.net` 和 `static.adtidy.org`，防止作为下游时检查更新和下载“DNS 黑名单”失败），提高兼容性  
-`fake-ip-filter` 中添加 [TrackersList](https://github.com/XIU2/TrackersListCollection/blob/master/all.txt)，防止 [BT 下载](https://github.com/c0re100/qBittorrent-Enhanced-Edition)无法连接 TrackersList UDP 协议  
-<img src="https://user-images.githubusercontent.com/45238096/224113233-4d76dec2-495c-4790-a00e-538fc1469639.png" width="60%"/>
-
-若想自己生成配置文件 user.yaml，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```name: Generate `clash` ruleset-xxx-user.yaml``` 部分  
-若 DNS 模式选用的是 `redir-host`，必须进行 DNS 分流（可以参考 [mihomo 内核 DNS 分流教程](https://github.com/DustinWin/clash_singbox-tutorials/tree/main/%E6%95%99%E7%A8%8B%E5%90%88%E9%9B%86/Clash/%E8%BF%9B%E9%98%B6%E7%AF%87)），可以进入 *.github/workflows/config.yml* 文件，编辑 ```Generate `clash` ruleset-redirhost-user.yaml``` 部分  
-• 导入 Linux 端（以导入 ShellCrash 为例）  
-连接 SSH 后执行如下命令：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `redirhost`）
-
-```
-curl -o $CRASHDIR/yamls/user.yaml -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash-config/ruleset-{DNS 模式}-user-lite-noprocess.yaml
-$CRASHDIR/start.sh restart
-```
-• 导入 Windows 端（以导入 Clash Verge 为例）  
-以管理员身份打开 CMD 命令提示符，执行如下命令：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `redirhost`）
-
-```
-taskkill /f /t /im "Clash Verge*"
-taskkill /f /t /im Clash-Verge*
-taskkill /f /t /im clash-meta*
-curl -o %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\profiles\Merge.yaml -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash-config/ruleset-{DNS 模式}-user.yaml
-```
-</details>
-<details>
-<summary>② <a href="https://github.com/DustinWin/ruleset_geodata/tree/sing-box-config">dns.json</a>（仅限 sing-box PuerNya 版内核）</summary>
-
-注：
-- 1. 每天凌晨 3 点（北京时间）自动构建
-- 2. 含有“lite”后缀的 .json 配置文件适合无 sing-box 广告拦截的方案（可搭配 AdGuard Home）
-
-• `dns.fakeip.exclude_rule` 数组  
-`dns.fakeip.exclude_rule` 中的 `"rule_set": [ "fakeip-filter" ]` 添加 [ShellCrash/public/fake_ip_filter.list](https://github.com/juewuy/ShellCrash/blob/dev/public/fake_ip_filter.list)（已添加 AdGuard Home 相关域名，包括：`adguardteam.github.io`、`adrules.top`、`anti-ad.net` 和 `static.adtidy.org`，防止作为下游时检查更新和下载“DNS 黑名单”失败），提高兼容性  
-`dns.fakeip.exclude_rule` 中的 `"rule_set": [ "private" ]` 添加 [TrackersList](https://github.com/XIU2/TrackersListCollection/blob/master/all.txt)，防止 [BT 下载](https://github.com/c0re100/qBittorrent-Enhanced-Edition)无法连接 TrackersList UDP 协议  
-<img src="https://user-images.githubusercontent.com/45238096/224113233-4d76dec2-495c-4790-a00e-538fc1469639.png" width="60%"/>
-
-若想自己生成配置文件 dns.json，可以 [Fork 本项目](https://github.com/DustinWin/ruleset_geodata/fork)后编辑 *.github/workflows/config.yml* 文件内的 ```Generate `sing-box` ruleset-xxx-dns-xxx.json``` 部分  
-• 导入 Linux 端（以导入 ShellCrash 为例）  
-连接 SSH 后执行如下命令：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip` 或 `mix`）
-
-```
-curl -o $CRASHDIR/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/ruleset-{DNS 模式}-dns-lite.json
-$CRASHDIR/start.sh restart
-```
-</details>
-<details>
-<summary>③ 添加定时任务（以 ShellCrash 为例，安装路径为 <i>/data/ShellCrash</i>）</summary>
-
-• 连接 SSH 后执行 `vi $CRASHDIR/task/task.user`，按一下 Ins 键（Insert 键），粘贴如下内容：
-- 注：将下面命令中的 `{DNS 模式}` 替换为正在使用的 DNS 模式（`fakeip`、`redirhost` 或 `mix`）
-
-```
-# 适用于 mihomo 内核
-201#curl -o /data/ShellCrash/yamls/user.yaml -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@clash-config/ruleset-{DNS 模式}-user-lite-noprocess.yaml && /data/ShellCrash/start.sh restart >/dev/null 2>&1#更新user.yaml
-$ 适用于 sing-box PuerNya 版内核
-205#curl -o /data/ShellCrash/jsons/dns.json -L https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@sing-box-config/ruleset-{DNS 模式}-dns-lite.json#更新dns.json
-```
-• 按一下 Esc 键（退出键），输入英文冒号 `:`，继续输入 `wq` 并回车  
-• 执行 `crash`，进入 ShellCrash -> 5 配置自动任务 -> 1 添加自动任务，可以看到末尾就有添加的定时任务，输入对应的数字并回车后可设置执行条件
 </details>
