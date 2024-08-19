@@ -2,14 +2,12 @@ name: Build ruleset and geodata
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 18 * * *"
+    - cron: "0 19 * * *"
   push:
     branches:
       - master
     paths-ignore:
       - "**/README.md"
-      - ".github/workflows/delete-old-workflows.yml"
-      - ".github/workflows/config.yml"
 
 jobs:
   build:
