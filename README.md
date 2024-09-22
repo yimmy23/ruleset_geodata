@@ -1,3 +1,5 @@
+# 注：单独给 sing-box v1.9.0 版本的内核生成了[规则集](https://github.com/DustinWin/ruleset_geodata/tree/sing-box-ruleset-compatible)
+
 # 一、 geodata 规则集文件说明
 ## 1. 文件类型
 ① Clash geodata 规则集文件，包括：geosite.dat、geoip.dat、Country.mmdb 和 geoip.metadb、ASN.mmdb（仅限 [mihomo 内核](https://github.com/MetaCubeX/mihomo)）等  
